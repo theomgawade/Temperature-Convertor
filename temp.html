@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Temperature Converter</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-image: url('temp.jpg'); /* Add your background image URL */
+            background-size: cover;
+            background-position: center;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        .converter {
+            background-color: rgba(255, 255, 255, 0.8); /* Semi-transparent background */
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+            text-align: center;
+            padding: 20px;
+            width: 320px;
+        }
+
+        h1 {
+            color: #333;
+            margin-bottom: 20px;
+        }
+
+        .input-container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+
+        .input-field {
+            flex: 0 0 45%;
+            margin-bottom: 10px;
+        }
+
+        input[type="number"], input[type="text"] {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        button {
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        .result {
+            font-size: 24px;
+            color: #333;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="converter">
+        <h1>Temperature Converter</h1>
+        <div class="input-container">
+            <div class="input-field">
+                <input type="number" id="inputTemp" placeholder="Enter temperature">
+            </div>
+            <div class="input-field">
+                <select id="fromUnit">
+                    <option value="celsius">Celsius (°C)</option>
+                    <option value="fahrenheit">Fahrenheit (°F)</option>
+                    <option value="kelvin">Kelvin (K)</option>
+                    <option value="rankine">Rankine (°R)</option>
+                    <option value="custom">Custom</option>
+                </select>
+            </div>
+            <div class="input-field">
+                <select id="toUnit">
+                    <option value="celsius">Celsius (°C)</option>
+                    <option value="fahrenheit">Fahrenheit (°F)</option>
+                    <option value="kelvin">Kelvin (K)</option>
+                    <option value="rankine">Rankine (°R)</option>
+                    <option value="custom">Custom</option>
+                </select>
+            </div>
+        </div>
+        <div class="input-container">
+            <div class="input-field" id="customFormulaField">
+                <input type="text" id="customFormula" placeholder="Custom Formula (e.g., C = (F-32)*5/9)">
+            </div>
+        </div>
+        <button id="convertBtn">Convert</button>
+        <div class="result" id="result"></div>
+    </div>
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const convertBtn = document.getElementById("convertBtn");
+            const customFormulaField = document.getElementById("customFormulaField");
+
+            // Hide the custom formula input initially
+            customFormulaField.style.display = "none";
+
+            const fromUnit = document.getElementById("fromUnit");
+            fromUnit.addEventListener("change", function () {
+                if (fromUnit.value === "custom") {
+                    customFormulaField.style.display = "block";
+                } else {
+                    customFormulaField.style.display = "none";
+                }
+            });
+
+            convertBtn.addEventListener("click", function () {
+                const inputTemp = parseFloat(document.getElementById("inputTemp").value);
+                const fromUnit = document.getElementById("fromUnit").value;
+                const toUnit = document.getElementById("toUnit").value;
+                const customFormula = document.getElementById("customFormula").value;
+                const resultContainer = document.getElementById("result");
+
+                if (isNaN(inputTemp)) {
+                    resultContainer.textContent = "Please enter a valid temperature.";
+                    return;
+                }
+
+                let convertedTemp, convertedUnit;
+
+                if (fromUnit === "custom") {
+                    try {
+                        const formula = customFormula
+                            .replace(/C/g, 'convertedTemp')
+                            .replace(/°C/g, 'convertedUnit');
+                        eval(formula);
+                    } catch (error) {
+                        resultContainer.textContent = "Invalid custom formula.";
+                        return;
+                    }
+                } else {
+                    // Implement temperature conversion here
+                    if (fromUnit === "celsius") {
+                        if (toUnit === "fahrenheit") {
+                            convertedTemp = (inputTemp * 9/5) + 32;
+                            convertedUnit = "Fahrenheit (°F)";
+                        } else if (toUnit === "kelvin") {
+                            convertedTemp = inputTemp + 273.15;
+                            convertedUnit = "Kelvin (K)";
+                        } else if (toUnit === "rankine") {
+                            convertedTemp = (inputTemp + 273.15) * 9/5;
+                            convertedUnit = "Rankine (°R)";
+                        } else {
+                            // If "toUnit" is "celsius", no conversion needed
+                            convertedTemp = inputTemp;
+                            convertedUnit = "Celsius (°C)";
+                        }
+                    } else if (fromUnit === "fahrenheit") {
+                        if (toUnit === "celsius") {
+                            convertedTemp = (inputTemp - 32) * 5/9;
+                            convertedUnit = "Celsius (°C)";
+                        } else if (toUnit === "kelvin") {
+                            convertedTemp = (inputTemp - 32) * 5/9 + 273.15;
+                            convertedUnit = "Kelvin (K)";
+                        } else if (toUnit === "rankine") {
+                            convertedTemp = inputTemp + 459.67;
+                            convertedUnit = "Rankine (°R)";
+                        } else {
+                            // If "toUnit" is "fahrenheit", no conversion needed
+                            convertedTemp = inputTemp;
+                            convertedUnit = "Fahrenheit (°F)";
+                        }
+                    } else if (fromUnit === "kelvin") {
+                        if (toUnit === "celsius") {
+                            convertedTemp = inputTemp - 273.15;
+                            convertedUnit = "Celsius (°C)";
+                        } else if (toUnit === "fahrenheit") {
+                            convertedTemp = (inputTemp - 273.15) * 9/5 + 32;
+                            convertedUnit = "Fahrenheit (°F)";
+                        } else if (toUnit === "rankine") {
+                            convertedTemp = inputTemp * 9/5;
+                            convertedUnit = "Rankine (°R)";
+                        } else {
+                            // If "toUnit" is "kelvin", no conversion needed
+                            convertedTemp = inputTemp;
+                            convertedUnit = "Kelvin (K)";
+                        }
+                    } else if (fromUnit === "rankine") {
+                        if (toUnit === "celsius") {
+                            convertedTemp = (inputTemp - 491.67) * 5/9;
+                            convertedUnit = "Celsius (°C)";
+                        } else if (toUnit === "fahrenheit") {
+                            convertedTemp = inputTemp - 459.67;
+                            convertedUnit = "Fahrenheit (°F)";
+                        } else if (toUnit === "kelvin") {
+                            convertedTemp = (inputTemp - 491.67) * 5/9 + 273.15;
+                            convertedUnit = "Kelvin (K)";
+                        } else {
+                            // If "toUnit" is "rankine", no conversion needed
+                            convertedTemp = inputTemp;
+                            convertedUnit = "Rankine (°R)";
+                        }
+                    } else {
+                        // If "fromUnit" is not recognized, display an error
+                        resultContainer.textContent = "Invalid 'from' unit selected.";
+                        return;
+                    }
+                }
+
+                resultContainer.textContent = `Converted Temperature: ${convertedTemp.toFixed(2)} ${convertedUnit}`;
+            });
+        });
+    </script>
+</body>
+</html>
